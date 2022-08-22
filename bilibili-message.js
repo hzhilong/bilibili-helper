@@ -15,10 +15,12 @@
     //   目前（2022年8月22日）好像使用不了。
 
     const urlPattern =
-        /^https?:\/\/message\.bilibili\.com\/.*#\/(reply|love|at)$/;
+        /^https?:\/\/message\.bilibili\.com\/.*#\/(reply|love|at|whisper).*$/;
     const urlPatternReply = /^https?:\/\/message\.bilibili\.com\/.*#\/reply$/;
     const urlPatternAt = /^https?:\/\/message\.bilibili\.com\/.*#\/at$/;
     const urlPatternLove = /^https?:\/\/message\.bilibili\.com\/.*#\/love$/;
+    const urlPatternWhisper =
+        /^https?:\/\/message\.bilibili\.com\/.*#\/whisper.*$/;
 
     const sleep = (fn, ms) => {
         if (fn === undefined || fn === null) {
@@ -34,19 +36,23 @@
     let clearBtn = null;
     let isCleaning = false;
 
-    const clearMessage = async () => {
+    const clear = async (
+        scrollPaneSelector,
+        routerPanelSelector,
+        delBtnSelector
+    ) => {
         let delBtn;
         let failedCount = 0;
         let delCount = 0;
 
-        let scrollPane = document.querySelector(".space-right-bottom");
-        let routerPanel = scrollPane.querySelector(".router-view");
+        let scrollPane = document.querySelector(scrollPaneSelector);
+        let routerPanel = scrollPane.querySelector(routerPanelSelector);
 
         while (isCleaning && failedCount < 4) {
             scrollPane.scrollTop = routerPanel.offsetHeight;
             scrollPane.scrollTop = 0;
             delBtn = document.querySelector(
-                ".confirm-popup .bl-button--primary"
+                delBtnSelector
             );
             if (delBtn) {
                 delBtn.click();
@@ -88,6 +94,8 @@
                 clearBtn.innerText = "清空消息";
             } else if (urlPatternLove.test(document.URL)) {
                 clearBtn.innerText = "清空通知";
+            } else if (urlPatternWhisper.test(document.URL)) {
+                clearBtn.innerText = "清空私信";
             } else {
                 clearBtn.style.display = "none";
             }
@@ -107,19 +115,30 @@
                 isCleaning = !isCleaning;
                 refreshDisplayText();
             } else {
-                if (document.querySelector(".nothing")) {
+                let url = document.URL;
+                if (urlPatternWhisper.test(url)){
+                    if(!document.querySelector(".bili-im .list-container .list .list-item")){
+                        alert("当前私信为空");
+                        return;
+                    }
+                }else if(document.querySelector(".nothing")){
                     alert("当前消息为空");
-                } else if (confirm("确定清空？")) {
+                    return;
+                }
+                if (confirm("确定清空？")) {
                     isCleaning = !isCleaning;
                     refreshDisplayText();
-                    clearMessage();
+                    if (urlPatternWhisper.test(url)) {
+                        clear(".bili-im .list-container", ".list", ".bili-im .list-container .list .list-item .close")
+                    }else{
+                        clear(".space-right-bottom", ".router-view", ".confirm-popup .bl-button--primary")
+                    }
                 }
             }
         });
     };
 
     const loadScript = async () => {
-        console.log("loadScript");
         isCleaning = false;
         if (clearBtn !== null) {
             refreshDisplay();
@@ -130,7 +149,7 @@
     };
 
     window.onload = () => {
-        sleep(()=>{
+        sleep(() => {
             let list = document.querySelectorAll(".space-left .list .item");
             list.forEach((item) => {
                 if (!item.classList.contains("added-event")) {
@@ -138,10 +157,9 @@
                     item.addEventListener("click", loadScript);
                 }
             });
-            console.log(document.URL);
             if (urlPattern.test(document.URL)) {
                 loadScript();
             }
-        }, 500)
+        }, 500);
     };
 })();
