@@ -38,6 +38,7 @@
         let delBtn;
         let failedCount = 0;
         let delCount = 0;
+
         let scrollPane = document.querySelector(".space-right-bottom");
         let routerPanel = scrollPane.querySelector(".router-view");
 
@@ -56,6 +57,7 @@
             }
             await sleep(() => {}, 500);
         }
+
         isCleaning = false;
         refreshDisplayText();
         if (delCount > 0) {
@@ -105,7 +107,9 @@
                 isCleaning = !isCleaning;
                 refreshDisplayText();
             } else {
-                if (confirm("确定清空？")) {
+                if (document.querySelector(".nothing")) {
+                    alert("当前消息为空");
+                } else if (confirm("确定清空？")) {
                     isCleaning = !isCleaning;
                     refreshDisplayText();
                     clearMessage();
@@ -118,6 +122,7 @@
         isCleaning = false;
         if (clearBtn !== null) {
             refreshDisplay();
+            refreshDisplayText();
         } else {
             createClearBtn();
         }
