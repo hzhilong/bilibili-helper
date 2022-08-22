@@ -119,6 +119,7 @@
     };
 
     const loadScript = async () => {
+        console.log("loadScript");
         isCleaning = false;
         if (clearBtn !== null) {
             refreshDisplay();
@@ -129,15 +130,18 @@
     };
 
     window.onload = () => {
-        let list = document.querySelectorAll(".space-left .list .item");
-        list.forEach((item) => {
-            if (!item.classList.contains("added-event")) {
-                item.classList.add("added-event");
-                item.addEventListener("click", loadScript);
+        sleep(()=>{
+            let list = document.querySelectorAll(".space-left .list .item");
+            list.forEach((item) => {
+                if (!item.classList.contains("added-event")) {
+                    item.classList.add("added-event");
+                    item.addEventListener("click", loadScript);
+                }
+            });
+            console.log(document.URL);
+            if (urlPattern.test(document.URL)) {
+                loadScript();
             }
-        });
-        if (urlPattern.test(document.URL)) {
-            loadScript();
-        }
+        }, 500)
     };
 })();
