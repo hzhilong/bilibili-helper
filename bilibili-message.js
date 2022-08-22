@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         哔哩哔哩消息清理助手
+// @name         Bilibili 消息清理助手
 // @namespace    https://github.com/hzhilong/bilibili-helper/
 // @version      0.1
-// @description  快速清空哔哩哔哩个人消息通知（“回复我的”、“@ 我的”，“收到的赞”）
+// @description  快速清空哔哩哔哩个人消息通知（“回复我的”、“@ 我的”，“收到的赞”）。使用方法：点击消息页面右下角按钮即可。
 // @author       hzhilong
 // @match        https://message.bilibili.com/*
 // @license      MIT
@@ -10,6 +10,9 @@
 
 (function () {
     "use strict";
+
+    // 参考脚本：https://www.tore.moe/post/bilibili-massage-cleaner
+    //   目前（2022年8月22日）好像使用不了。
 
     const urlPattern =
         /^https?:\/\/message\.bilibili\.com\/.*#\/(reply|love|at)$/;
